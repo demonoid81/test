@@ -1,0 +1,217 @@
+enum Gender
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Gender") {
+  Male
+  Female
+}
+
+enum PersonSortableField
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.PersonSortableField"
+  ) {
+  uuid
+  created
+  updated
+  surname
+  name
+  patronymic
+  birthDate
+  inn
+}
+
+input PersonSort
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.PersonSort") {
+  field: UserSortableField
+  order: SortOrder = ASC
+}
+
+input PersonFilter
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.PersonFilter") {
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  surname: StringFilter
+  name: StringFilter
+  patronymic: StringFilter
+  birthDate: DateFilter
+  inn: StringFilter
+  and: [PersonFilter]
+  or: [PersonFilter]
+  not: PersonFilter
+}
+
+type RecognizedField
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.RecognizedField"
+  ) {
+  result: String
+  confidence: Float
+  valid: Boolean
+}
+
+type RecognizedFields
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.RecognizedFields"
+  ) {
+  error: String
+  surname: RecognizedField
+  name: RecognizedField
+  patronymic: RecognizedField
+  birthDate: RecognizedField
+  gender: RecognizedField
+  serial: RecognizedField
+  number: RecognizedField
+  department: RecognizedField
+  dateIssue: RecognizedField
+  departmentCode: RecognizedField
+}
+
+input PersonInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Person") {
+  uuid: UUID
+  user: UserInput
+  actualContact: ContactInput
+  contacts: [ContactInput]
+  passport: PassportInput
+  surname: String
+  name: String
+  patronymic: String
+  birthDate: Date
+  gender: Gender
+  country: CountryInput
+  inn: String
+  medicalBook: MedicalBookInput
+  photo: ContentInput
+  isDeleted: Boolean
+  position: OrganizationPositionInput
+  isContact: Boolean
+  validated: Boolean
+}
+
+type Person
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Person") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  user: User
+  actualContact: Contact
+  contacts: [Contact]
+  passport: Passport
+  surname: String
+  name: String
+  patronymic: String
+  birthDate: Date
+  gender: Gender
+  country: Country
+  inn: String
+  medicalBook: MedicalBook
+  photo: Content
+  isDeleted: Boolean
+  position: OrganizationPosition
+  isContact: Boolean
+  recognizeResult: JSON
+  distanceResult: JSON
+  recognizedFields: RecognizedFields
+  validated: Boolean
+  rating: Float
+  taxPayment: Boolean
+  incomeRegistration: Boolean
+}
+
+input PersonCourseInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.PersonCourse") {
+  uuid: UUID
+  isDeleted: Boolean
+  person: PersonInput
+  course: CourseInput
+  questions: Int
+  answers: Int
+}
+
+type PersonCourse
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.PersonCourse") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  person: Person
+  course: Course
+  questions: Int
+  answers: Int
+}
+
+type PersonValidateStatus {
+  passport: Boolean!
+  avatar: Boolean!
+}
+
+input PersonRatingInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.PersonRating") {
+  uuid: UUID
+  isDeleted: Boolean
+  person: PersonInput
+  job: JobInput
+  rating: Float
+  description: String
+}
+
+type PersonRating
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.PersonRating") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  person: Person
+  job: Job
+  rating: Float
+  description: String
+}
+
+type Taxes {
+  proceeds: Float
+  preliminary: Float
+  tax: Float
+  penalty: Float
+}
+
+directive @BlockParsePerson on FIELD_DEFINITION
+
+extend type Query {
+  person(person: PersonInput!): Person @Private
+  persons(
+    person: PersonInput
+    filter: PersonFilter
+    sort: [PersonSort!]
+    offset: Int
+    limit: Int
+  ): [Person] @Private
+  parsePerson(photo: Upload, passport: Upload): PersonValidateStatus!
+    @Private
+    @BlockParsePerson
+  validateINN(inn: String!): Boolean @Private
+  personCourses(course: PersonCourseInput): [PersonCourse] @Private
+  getPersonRating(person: PersonInput!): Float @Private
+  getMyRating: Float @Private
+  personRating(personRating: PersonRatingInput): PersonRating @Private
+  personRatings(
+    personRating: PersonRatingInput
+    offset: Int
+    limit: Int
+  ): [PersonRating] @Private
+  getSelfEmployerStatus: Boolean! @Private
+  personTax: Taxes! @Private
+}
+
+extend type Mutation {
+  personMutation(person: PersonInput): Person @Private
+  personCourseMutation(course: PersonCourseInput): PersonCourse @Private
+  personRatingMutation(personRating: PersonRatingInput): PersonRating @Private
+  " соглашение на работу с налоговой"
+  agreement(incomeRegistration: Boolean!, taxPayment: Boolean!): Boolean!
+    @Private
+  removeContact(person: PersonInput, contact: ContactInput): Boolean! @Private
+  reqToPartner: Boolean!
+}
+
+extend type Subscription {
+  parsePersonSub: RecognizedFields! @Private
+  personSub: Person @Private
+}

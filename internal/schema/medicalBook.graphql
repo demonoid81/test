@@ -1,0 +1,46 @@
+input MedicalBookInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.MedicalBook") {
+  uuid: UUID
+  number: String
+  medicalExaminationDate: Date
+  contents: [ContentInput]
+  person: PersonInput
+  isDeleted: Boolean
+  haveHealthRestrictions: Boolean
+  haveMedicalBook: Boolean
+  descriptionHealthRestrictions: String
+  checked: Boolean
+  checkedDate: Date
+  checkedPerson: PersonInput
+}
+
+type MedicalBook
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.MedicalBook") {
+  uuid: UUID
+  number: String
+  medicalExaminationDate: Date
+  contents: [Content]
+  person: Person
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  haveHealthRestrictions: Boolean
+  haveMedicalBook: Boolean
+  descriptionHealthRestrictions: String
+  checked: Boolean
+  checkedDate: Date
+  checkedPerson: Person
+}
+
+extend type Query {
+  medicalBook(medicalBook: MedicalBookInput!): MedicalBook @Private
+  medicalBooks(
+    medicalBook: MedicalBookInput
+    offset: Int
+    limit: Int
+  ): [MedicalBook] @Private
+}
+
+extend type Mutation {
+  medicalBookMutation(medicalBook: MedicalBookInput): MedicalBook @Private
+}

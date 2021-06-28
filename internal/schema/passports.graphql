@@ -1,0 +1,83 @@
+enum PassportSortableField
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.PassportSortableField"
+  ) {
+  uuid
+  created
+  updated
+  serial
+  number
+  dateIssue
+  departmentCode
+  department
+}
+
+input PassportSort
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.PassportSort") {
+  field: UserSortableField
+  order: SortOrder = ASC
+}
+
+input PassportFilter
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.PassportFilter"
+  ) {
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  serial: StringFilter
+  number: StringFilter
+  departmentCode: StringFilter
+  department: StringFilter
+  dateIssue: DateFilter
+  and: [UserFilter]
+  or: [UserFilter]
+  not: UserFilter
+}
+
+input PassportInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Passport") {
+  uuid: UUID
+  serial: String
+  number: String
+  dateIssue: Date
+  departmentCode: String
+  department: String
+  person: PersonInput
+  scan: ContentInput
+  addressRegistration: AddressInput
+  photoRegistration: ContentInput
+  isDeleted: Boolean
+}
+
+type Passport
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Passport") {
+  uuid: UUID
+  serial: String
+  number: String
+  departmentCode: String
+  department: String
+  dateIssue: Date
+  person: Person
+  created: DateTime
+  updated: DateTime
+  scan: Content
+  addressRegistration: Address
+  photoRegistration: Content
+  isDeleted: Boolean
+}
+
+extend type Query {
+  passport(passport: PassportInput!): Passport @Private
+  passports(
+    passport: PassportInput
+    filter: PassportFilter
+    sort: [PassportSort!]
+    offset: Int
+    limit: Int
+  ): [Passport] @Private
+}
+
+extend type Mutation {
+  "работа с паспортами"
+  passportMutation(passport: PassportInput): Passport @Private
+}

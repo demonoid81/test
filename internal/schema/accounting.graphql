@@ -1,0 +1,93 @@
+enum Direct {
+  plus
+  minus
+}
+
+enum DestinationMovement {
+  selfEmployer
+  taxing
+  commission
+  reward
+  rewardTax
+}
+
+input MovementInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Movement") {
+  uuid: UUID
+  isDeleted: Boolean
+  organization: OrganizationInput
+  direct: Direct
+  destination: DestinationMovement
+  person: PersonInput
+  job: JobInput
+  amount: Float
+}
+
+input MovementFilter
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.MovementFilter"
+  ) {
+  uuid: UUIDFilter
+  isDeleted: Boolean
+  organization: OrganizationFilter
+  direct: Direct
+  destination: DestinationMovement
+  person: PersonFilter
+  job: JobFilter
+  amount: Float
+  and: [MovementFilter]
+  or: [MovementFilter]
+  not: MovementFilter
+}
+
+type Balance
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Balance") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  organization: Organization
+  amount: Float
+  movement: Movement
+}
+
+type Movement
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Movement") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  organization: Organization
+  direct: Direct
+  destination: DestinationMovement
+  person: Person
+  job: Job
+  amount: Float
+  link: String
+}
+
+type stat {
+  month: Float
+  previousMonth: Float
+  quarter: Float
+}
+
+extend type Query {
+  movement(movement: MovementInput): Movement @Private
+  movements(
+    movement: MovementInput
+    filter: MovementFilter
+    offset: Int
+    limit: Int
+  ): [Movement] @Private
+  flowBalance(organization: OrganizationInput, from: Date, to: Date): [Balance]
+    @Private
+  getBalance(organization: OrganizationInput!, until: Date): Float @Private
+  statistics(organization: OrganizationInput): stat @Private
+}
+
+extend type Mutation {
+  movementMutation(movement: MovementInput): Movement @Private
+  addToBalance(organization: OrganizationInput!, amount: Float!): Boolean!
+    @Private
+}

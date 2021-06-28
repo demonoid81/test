@@ -1,0 +1,100 @@
+package lua
+
+import (
+	"errors"
+	"unsafe"
+)
+
+//#cgo linux freebsd darwin pkg-config: luajit
+//#cgo LDFLAGS:  -lluajit-5.1 -ldl -lm
+//#include "glua.h"
+import "C"
+
+var (
+	methodDic map[string]func(...interface{}) (interface{}, error)
+)
+
+func init() {
+	methodDic = make(map[string]func(...interface{}) (interface{}, error))
+}
+
+func RegisterExternMethod(methodName string, method func(...interface{}) (interface{}, error)) error {
+	_, ok := methodDic[methodName]
+	if ok {
+		return errors.New("Duplicate Method Name")
+	}
+	methodDic[methodName] = method
+	return nil
+}
+
+//export sync_go_method
+func sync_go_method(vm *C.struct_lua_State) C.int {
+	count := int(C.lua_gettop(vm))
+	args := make([]interface{}, count)
+	for {
+		count = int(C.lua_gettop(vm))
+		if count == 0 {
+			break
+		}
+		args[count-1] = pullFromLua(vm, -1)
+		C.glua_pop(vm, 1)
+	}
+	methodName := args[0].(string)
+	if len(args) > 1 {
+		args = args[1:]
+	} else {
+		args = make([]interface{}, 0)
+	}
+
+	tagetMethod, ok := methodDic[methodName]
+	if false == ok {
+		C.lua_pushnil(vm)
+		cStr := C.CString("Invalid Method Name")
+		defer C.free(unsafe.Pointer(cStr))
+		C.lua_pushstring(vm, cStr)
+		return 2
+	}
+	res, err := tagetMethod(args...)
+	if err != nil {
+		pushToLua(vm, 0)
+		cStr := C.CString(err.Error())
+		defer C.free(unsafe.Pointer(cStr))
+		C.lua_pushstring(vm, cStr)
+		return 2
+	} else {
+		pushToLua(vm, res)
+		C.lua_pushnil(vm)
+		return 2
+	}
+}
+
+//export async_go_method
+func async_go_method(vm *C.struct_lua_State) C.int {
+	count := int(C.lua_gettop(vm))
+	args := make([]interface{}, count)
+	for {
+		count = int(C.lua_gettop(vm))
+		if count == 0 {
+			break
+		}
+		args[count-1] = pullFromLua(vm, -1)
+		C.glua_pop(vm, 1)
+	}
+	methodName := args[0].(string)
+	if len(args) > 1 {
+		args = args[1:]
+	} else {
+		args = make([]interface{}, 0)
+	}
+
+	storeYieldContext(vm, methodName, args...)
+	return 0
+}
+
+func callExternMethod(methodName string, args ...interface{}) (interface{}, error) {
+	tagetMethod, ok := methodDic[methodName]
+	if false == ok {
+		return nil, errors.New("Invalid Method Name")
+	}
+	return tagetMethod(args...)
+}

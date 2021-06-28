@@ -1,0 +1,165 @@
+enum OrganizationType
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.OrganizationType"
+  ) {
+  Org
+  Dep
+}
+
+input OrganizationPositionInput
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.OrganizationPosition"
+  ) {
+  uuid: UUID
+  name: String
+  isDeleted: Boolean
+}
+
+input OrganizationContactInput
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.OrganizationContact"
+  ) {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  position: OrganizationPositionInput
+  person: PersonInput
+  isDeleted: Boolean
+}
+
+input OrganizationInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Organization") {
+  uuid: UUID
+  name: String
+  inn: String
+  kpp: String
+  addressLegal: AddressInput
+  addressFact: AddressInput
+  parent: OrganizationInput
+  parentOrganization: OrganizationInput
+  departments: [OrganizationInput]
+  isDeleted: Boolean
+  logo: ContentInput
+  prefix: String
+  fullName: String
+  shortName: String
+  fee: Float
+  persons: [PersonInput]
+  isGroup: Boolean
+  firstReserveReward: Float
+  secondReserveReward: Float
+  stDistance: Float
+  stTime: Duration
+}
+
+type OrganizationPosition
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.OrganizationPosition"
+  ) {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  name: String
+  isDeleted: Boolean
+}
+
+input OrganizationFilter {
+  uuid: UUIDFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  name: StringFilter
+  inn: StringFilter
+  kpp: StringFilter
+  addressLegal: AddressFilter
+  addressFact: AddressFilter
+  parent: OrganizationFilter
+  parentOrganization: OrganizationFilter
+  isDeleted: Boolean
+  prefix: StringFilter
+  fullName: StringFilter
+  shortName: StringFilter
+  fee: FloatFilter
+}
+
+type OrganizationContact
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.OrganizationContact"
+  ) {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  position: OrganizationPosition
+  person: Person
+  isDeleted: Boolean
+}
+
+type Organization
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Organization") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isGroup: Boolean
+  name: String
+  inn: String
+  kpp: String
+  addressLegal: Address
+  addressFact: Address
+  parent: Organization
+  parentOrganization: Organization
+  departments: [Organization]
+  isDeleted: Boolean
+  logo: Content
+  prefix: String
+  fullName: String
+  shortName: String
+  fee: Float
+  firstReserveReward: Float
+  secondReserveReward: Float
+  persons: [Person]
+  stDistance: Float
+  stTime: Duration
+}
+
+extend type Query {
+  organizationPosition(
+    organizationPosition: OrganizationPositionInput
+  ): OrganizationPosition @Private
+  organizationPositions(
+    organizationPosition: OrganizationPositionInput
+    offset: Int
+    limit: Int
+  ): [OrganizationPosition] @Private
+  organizationContact(
+    organizationContact: OrganizationContactInput
+  ): OrganizationContact @Private
+  organizationContacts(
+    organizationContact: OrganizationContactInput
+    offset: Int
+    limit: Int
+  ): [OrganizationContact] @Private
+  organization(organization: OrganizationInput): Organization @Private
+  organizations(
+    organization: OrganizationInput
+    offset: Int
+    limit: Int
+  ): [Organization] @Private
+  getOrganizationRating(organization: OrganizationInput): Float @Private
+}
+
+extend type Mutation {
+  organizationPositionMutation(
+    organizationPosition: OrganizationPositionInput
+  ): OrganizationPosition @Private
+  organizationContactMutation(
+    organizationContact: OrganizationContactInput
+  ): OrganizationContact @Private
+  organizationMutation(organization: OrganizationInput): Organization @Private
+  excludePerson(organization: UUID!, person: UUID!): Boolean!
+  excludePersonInObject(organization: UUID!, person: UUID!): Boolean! @Private
+  dropOrganization(organization: OrganizationInput): Boolean! @Private
+  removeParent(organization: OrganizationInput): Boolean! @Private
+}
+
+extend type Subscription {
+  organizationSub: Organization
+}

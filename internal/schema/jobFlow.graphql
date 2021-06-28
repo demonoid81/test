@@ -1,0 +1,99 @@
+enum ScriptType {
+  prepare
+}
+
+type MsgStat
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.MsgStat") {
+  job: Job
+  person: Person
+  reading: Boolean!
+}
+
+input JobFlowInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.JobFlow") {
+  uuid: UUID
+  isDeleted: Boolean
+  organization: OrganizationInput
+  jobType: JobTypeInput
+  scriptType: ScriptType
+  diff: Int
+  script: String
+}
+
+type JobFlow
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.JobFlow") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  organization: Organization
+  jobType: JobType
+  scriptType: ScriptType
+  diff: Int
+  script: String
+}
+
+enum WorkerOrder {
+  Primary
+  Secondary
+}
+
+type InfoAboutJob {
+  workerOrder: WorkerOrder
+  courses: [Course]
+}
+
+extend type Query {
+  JobFlow(jobFlow: JobFlowInput): JobFlow @Private
+  "запрос открытия смены"
+  runJobRequest(job: JobInput, lat: Float, lon: Float): String @Private
+  "запрос закрытия смены"
+  endJobRequest(job: JobInput, lat: Float, lon: Float): String @Private
+  "подписаться на рассылку о горячей смены"
+  signToHotJob: Boolean @Private
+  getMsgStats: [MsgStat] @Private
+  userMsg(status: StatusInput, offset: Int, limit: Int): [Status] @Private
+}
+
+extend type Mutation {
+  JobFlowMutation(jobFlow: JobFlowInput): JobFlow @Private
+  "Публикация работы"
+  publishJob(job: JobInput): Boolean! @Private
+  "Согласен на смену"
+  agreeToJob(job: JobInput, user: UserInput): InfoAboutJob @Private
+  "Отказываюсь от смены"
+  refuseJob(job: JobInput, reason: String!): Boolean! @Private
+  "Проверка что сз движется"
+  check(job: JobInput, lat: Float, lon: Float, user: UserInput): Boolean!
+    @Private
+  "Пришел на смену"
+  onPlace(job: JobInput, lat: Float, lon: Float): Boolean! @Private
+  "Возник конфликт на смене"
+  conflictOnJob(job: JobInput, reason: String!): Boolean! @Private
+  "Смена статуса смены"
+  changeStatusJob(job: JobInput, status: StatusInput): Boolean! @Private
+  "Отменить смену"
+  cancelJob(job: JobInput, reason: String!): Boolean! @Private
+  "Отказаться от исполнителя"
+  rejectPerson(job: JobInput, person: PersonInput, reason: String!): Boolean!
+    @Private
+  "Проблема выполнения смены"
+  brokenJob(job: JobInput, reason: String!): Boolean! @Private
+  "Завершение смены по диспуту"
+  closeJob(job: JobInput, percentagePayment: Int): Boolean! @Private
+  "начать работу"
+  runJob(code: String): Boolean! @Private
+  "Закончить работу"
+  endJob(code: String, rating: Float, ratingDescription: String): PersonRating!
+    @Private
+  addMsg(
+    job: JobInput
+    description: String!
+    content: [ContentInput]
+  ): Boolean! @Private
+  readMsg(job: JobInput!): Boolean! @Private
+}
+
+extend type Subscription {
+  msgStatSub: MsgStat
+}

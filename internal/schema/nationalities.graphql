@@ -1,0 +1,24 @@
+input NationalityInput @goModel(model: "github.com/sphera-erp/sphera/internal/models.Nationality") {
+    uuid: UUID
+    name: String
+    isDeleted: Boolean
+}
+
+type Nationality @goModel(model: "github.com/sphera-erp/sphera/internal/models.Nationality") {
+    uuid: UUID
+    created: DateTime
+    updated: DateTime
+    name: String
+    isDeleted: Boolean
+}
+
+extend type Query {
+    "гражданство"
+    nationality(nationality: NationalityInput): Nationality @Private
+    "гражданства"
+    nationalities(nationality: NationalityInput, offset: Int, limit: Int): [Nationality] @Private
+}
+
+extend type Mutation {
+    nationalityMutation(nationality: NationalityInput): Nationality @Private
+}

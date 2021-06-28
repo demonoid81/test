@@ -1,0 +1,62 @@
+enum TypeRole {
+  system
+  organizationManager
+  groupManager
+  objectManager
+}
+
+input PermissionInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Permission") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  object: String
+  insert: Boolean
+  read: Boolean
+  update: Boolean
+  delete: Boolean
+}
+
+type Permission
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Permission") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  object: String
+  insert: Boolean
+  read: Boolean
+  update: Boolean
+  delete: Boolean
+}
+
+input RoleInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Role") {
+  uuid: UUID
+  isDeleted: Boolean
+  name: String
+  organization: OrganizationInput
+  roleType: TypeRole
+  permissions: [PermissionInput]
+}
+
+type Role @goModel(model: "github.com/sphera-erp/sphera/internal/models.Role") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  name: String
+  organization: Organization
+  roleType: TypeRole
+  permissions: [Permission]
+}
+
+extend type Query {
+  role(role: RoleInput): Role @Private
+  roles(role: RoleInput, offset: Int, limit: Int): [Role] @Private
+}
+
+extend type Mutation {
+  roleMutation(role: RoleInput): Role @Private
+}

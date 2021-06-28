@@ -1,0 +1,442 @@
+enum CandidateTags
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.CandidateTags"
+  ) {
+  primary
+  secondary
+  refused
+  rejected
+  notConfirm
+  noTraining
+}
+
+enum JobTypeIcon
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.JobTypeIcon") {
+  cleaner
+  cashier
+  loader
+  merchandiser
+}
+
+enum CourseType
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.CourseType") {
+  course
+  briefing
+}
+
+enum JobStatus {
+  created
+  draft
+  publish
+  full
+  ready
+  onObject
+  start
+  end
+  cancel
+  reset
+  dispute
+  reject
+}
+
+input CourseInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Course") {
+  uuid: UUID
+  isDeleted: Boolean
+  name: String
+  courseType: CourseType
+  content: String
+  organization: OrganizationInput
+  passingScore: Int
+}
+
+input CourseFilter {
+  uuid: UUIDFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  isDeleted: Boolean
+  name: StringFilter
+  courseType: CourseType
+  content: StringFilter
+  organization: OrganizationFilter
+  passingScore: IntFilter
+}
+
+type Course
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Course") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  name: String
+  courseType: CourseType
+  content: String
+  organization: Organization
+  passingScore: Int
+}
+
+input LocalityJobCostFilter {
+  uuid: UUIDFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  organization: OrganizationFilter
+  country: CountryFilter
+  region: RegionFilter
+  area: AreaFilter
+  city: CityFilter
+  cityDistrict: CityDistrictFilter
+  settlement: SettlementFilter
+  maxCost: FloatFilter
+  isDeleted: Boolean
+}
+
+input LocalityJobCostInput
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.LocalityJobCost"
+  ) {
+  uuid: UUID
+  organization: OrganizationInput
+  country: CountryInput
+  region: RegionInput
+  area: AreaInput
+  city: CityInput
+  cityDistrict: CityDistrictInput
+  settlement: SettlementInput
+  maxCost: Float
+  isDeleted: Boolean
+}
+
+type LocalityJobCost
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.LocalityJobCost"
+  ) {
+  uuid: UUID
+  created(start: String!, stop: String!): DateTime
+  updated: DateTime
+  organization: Organization
+  country: Country
+  region: Region
+  area: Area
+  city: City
+  cityDistrict: CityDistrict
+  settlement: Settlement
+  maxCost: Float
+  isDeleted: Boolean
+}
+
+input JobTypeFilter {
+  uuid: UUIDFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  icon: JobTypeIcon
+  organization: OrganizationFilter
+  name: StringFilter
+  isDeleted: Boolean
+}
+
+input JobTypeInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.JobType") {
+  uuid: UUID
+  icon: JobTypeIcon
+  organization: OrganizationInput
+  name: String
+  localityJobCost: [LocalityJobCostInput]
+  courses: [CourseInput]
+  isDeleted: Boolean
+  needMedicalBook: Boolean
+}
+
+type JobType
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.JobType") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  icon: JobTypeIcon
+  organization: Organization
+  name: String
+  localityJobCost: [LocalityJobCost]
+  courses: [Course]
+  isDeleted: Boolean
+  needMedicalBook: Boolean
+}
+
+input JobTemplateFilter {
+  uuid: UUIDFilter
+  name: StringFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  organization: OrganizationFilter
+  object: OrganizationFilter
+  region: RegionFilter
+  area: AreaFilter
+  city: CityFilter
+  jobType: JobTypeFilter
+  cost: FloatFilter
+  date: DateFilter
+  startTime: TimeFilter
+  endTime: TimeFilter
+  duration: IntFilter
+  description: StringFilter
+  published: DateFilter
+  isDeleted: Boolean
+}
+
+input JobTemplateInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.JobTemplate") {
+  uuid: UUID
+  name: String
+  organization: OrganizationInput
+  object: OrganizationInput
+  region: RegionInput
+  area: AreaInput
+  city: CityInput
+  jobType: JobTypeInput
+  cost: Float
+  date: Date
+  startTime: Time
+  endTime: Time
+  duration: Int
+  description: String
+  published: Date
+  isDeleted: Boolean
+}
+
+type JobTemplate
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.JobTemplate") {
+  uuid: UUID
+  name: String
+  created: DateTime
+  updated: DateTime
+  organization: Organization
+  object: Organization
+  region: Region
+  area: Area
+  city: City
+  jobType: JobType
+  cost: Float
+  date: Date
+  startTime: Time
+  endTime: Time
+  duration: Int
+  description: String
+  published: Date
+  isDeleted: Boolean
+}
+
+enum JobSortableField
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.JobSortableField"
+  ) {
+  uuid
+  created
+  updated
+  date
+  startTime
+  endTime
+  description
+}
+
+input JobSort
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.JobSort") {
+  field: JobSortableField
+  order: SortOrder = ASC
+}
+
+input JobFilter {
+  uuid: UUIDFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  date: DateFilter
+  startTime: TimeFilter
+  endTime: TimeFilter
+  duration: IntFilter
+  cost: FloatFilter
+  object: OrganizationFilter
+  jobTemplate: JobTemplateFilter
+  jobType: JobTypeFilter
+  description: StringFilter
+  isHot: Boolean
+  executor: PersonFilter
+  isDeleted: Boolean
+  status: StringFilter
+  rating: FloatFilter
+  and: [JobFilter]
+  or: [JobFilter]
+  not: JobFilter
+}
+
+input JobInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Job") {
+  uuid: UUID
+  name: String
+  date: Date
+  startTime: Time
+  endTime: Time
+  duration: Int
+  cost: Float
+  object: OrganizationInput
+  jobTemplate: JobTemplateInput
+  jobType: JobTypeInput
+  description: String
+  isHot: Boolean
+  published: Date
+  status: JobStatus
+  candidates: [CandidateInput]
+  executor: PersonInput
+  statuses: [StatusInput]
+  isDeleted: Boolean
+  rating: Float
+  ratingDescription: String
+}
+
+type Job @goModel(model: "github.com/sphera-erp/sphera/internal/models.Job") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  name: String
+  date: Date
+  startTime: Time
+  endTime: Time
+  duration: Int
+  cost: Float
+  object: Organization
+  jobTemplate: JobTemplate
+  jobType: JobType
+  description: String
+  isHot: Boolean
+  published: Date
+  status: JobStatus
+  candidates: [Candidate]
+  executor: Person
+  statuses: [Status]
+  isDeleted: Boolean
+  rating: Float
+  ratingDescription: String
+}
+
+input CandidateInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Candidate") {
+  uuid: UUID
+  person: PersonInput
+  job: JobInput
+  candidateTag: CandidateTags
+  isDeleted: Boolean
+}
+
+type Candidate
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Candidate") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  person: Person
+  job: Job
+  candidateTag: CandidateTags
+  isDeleted: Boolean
+}
+
+input StatusInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Status") {
+  uuid: UUID
+  person: PersonInput
+  job: JobInput
+  description: String
+  content: [ContentInput]
+  tags: [TagInput]
+  status: JobStatus
+  isDeleted: Boolean
+}
+
+type Status
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Status") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  person: Person
+  job: Job
+  status: JobStatus
+  description: String
+  content: [Content]
+  tags: [Tag]
+  isDeleted: Boolean
+  lat: Float
+  lon: Float
+}
+
+input TagInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Tag") {
+  uuid: UUID
+  name: String
+  isDeleted: Boolean
+}
+
+type Tag @goModel(model: "github.com/sphera-erp/sphera/internal/models.Tag") {
+  uuid: UUID
+  name: String
+  isDeleted: Boolean
+}
+
+extend type Query {
+  getTypeJobIcons: [String!] @Private
+  course(course: CourseInput): Course @Private
+  courses(course: CourseInput, offset: Int, limit: Int): [Course] @Private
+  localityJobCost(localityJobCost: LocalityJobCostInput): LocalityJobCost
+    @Private
+  localityJobCosts(
+    localityJobCost: LocalityJobCostInput
+    offset: Int
+    limit: Int
+  ): [LocalityJobCost] @Private
+  jobType(jobType: JobTypeInput): JobType @Private
+  jobTypes(jobType: JobTypeInput, offset: Int, limit: Int): [JobType] @Private
+  jobTemplate(jobTemplate: JobTemplateInput): JobTemplate @Private
+  jobTemplates(
+    jobTemplate: JobTemplateInput
+    offset: Int
+    limit: Int
+  ): [JobTemplate] @Private
+  job(job: JobInput): Job @Private
+  jobs(
+    job: JobInput
+    filter: JobFilter
+    sort: [JobSort!]
+    offset: Int
+    limit: Int
+  ): [Job] @Private
+  activeJobs(
+    job: JobInput
+    filter: JobFilter
+    sort: [JobSort!]
+    offset: Int
+    limit: Int
+  ): [Job] @Private
+  candidate(candidate: CandidateInput): Candidate @Private
+  candidates(candidate: CandidateInput, offset: Int, limit: Int): [Candidate]
+    @Private
+  status(status: StatusInput): Status @Private
+  statuses(status: StatusInput, offset: Int, limit: Int): [Status] @Private
+  tag(tag: TagInput): Tag @Private
+  tags(tag: TagInput, offset: Int, limit: Int): [Tag] @Private
+}
+
+extend type Mutation {
+  courseMutate(course: CourseInput): Course @Private
+  localityJobCostMutate(localityJobCost: LocalityJobCostInput): LocalityJobCost
+    @Private
+  jobTypeMutate(jobType: JobTypeInput): JobType @Private
+  jobTemplateMutate(jobTemplate: JobTemplateInput): JobTemplate @Private
+  jobMutate(job: JobInput): Job @Private
+  candidateMutate(candidate: CandidateInput): Candidate @Private
+  statusMutate(status: StatusInput): Status @Private
+  tagMutate(tag: TagInput): Tag @Private
+  massCreationJobs(
+    jobTemplate: JobTemplateInput!
+    objects: [OrganizationInput!]
+    Dates: [Date]
+  ): Boolean! @Private
+  setJobRating(job: UUID!, rating: Float!, description: String): Boolean!
+    @Private
+}
+
+extend type Subscription {
+  jobSub: Job
+}

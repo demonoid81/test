@@ -1,0 +1,322 @@
+input CountryFilter {
+  uuid: UUIDFilter
+  name: StringFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  isDeleted: Boolean
+}
+
+input CountryInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Country") {
+  uuid: UUID
+  name: String
+  isDeleted: Boolean
+}
+
+type Country
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Country") {
+  uuid: UUID
+  name: String
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+}
+
+input RegionFilter {
+  uuid: UUID
+  name: String
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+}
+
+input RegionInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Region") {
+  uuid: UUID
+  name: String
+  isDeleted: Boolean
+}
+
+type Region
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Region") {
+  uuid: UUID
+  name: String
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+}
+
+input AreaFilter {
+  uuid: UUIDFilter
+  region: RegionFilter
+  name: StringFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  isDeleted: Boolean
+}
+
+input AreaInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Area") {
+  uuid: UUID
+  region: RegionInput
+  name: String
+  isDeleted: Boolean
+}
+
+type Area @goModel(model: "github.com/sphera-erp/sphera/internal/models.Area") {
+  uuid: UUID
+  region: Region
+  name: String
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+}
+
+input CityFilter {
+  uuid: UUIDFilter
+  region: RegionFilter
+  area: AreaFilter
+  name: StringFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  isDeleted: Boolean
+}
+
+input CityInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.City") {
+  uuid: UUID
+  region: RegionInput
+  area: AreaInput
+  name: String
+  isDeleted: Boolean
+}
+
+type City @goModel(model: "github.com/sphera-erp/sphera/internal/models.City") {
+  uuid: UUID
+  region: Region
+  area: Area
+  name: String
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+}
+
+input CityDistrictFilter {
+  uuid: UUIDFilter
+  region: RegionFilter
+  area: AreaFilter
+  city: CityFilter
+  name: StringFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  isDeleted: Boolean
+}
+
+input CityDistrictInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.CityDistrict") {
+  uuid: UUID
+  region: RegionInput
+  area: AreaInput
+  city: CityInput
+  name: String
+  isDeleted: Boolean
+}
+
+type CityDistrict
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.CityDistrict") {
+  uuid: UUID
+  region: Region
+  area: Area
+  city: City
+  name: String
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+}
+
+input SettlementFilter {
+  uuid: UUIDFilter
+  region: RegionFilter
+  area: AreaFilter
+  city: CityFilter
+  cityDistrict: CityDistrictFilter
+  name: StringFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  isDeleted: Boolean
+}
+
+input SettlementInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Settlement") {
+  uuid: UUID
+  region: RegionInput
+  area: AreaInput
+  city: CityInput
+  cityDistrict: CityDistrictInput
+  name: String
+  isDeleted: Boolean
+}
+
+type Settlement
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Settlement") {
+  uuid: UUID
+  region: Region
+  area: Area
+  city: City
+  cityDistrict: CityDistrict
+  name: String
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+}
+
+input StreetFilter {
+  uuid: UUIDFilter
+  region: RegionFilter
+  area: AreaFilter
+  city: CityFilter
+  cityDistrict: CityDistrictFilter
+  settlement: SettlementFilter
+  name: StringFilter
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  isDeleted: Boolean
+}
+
+input StreetInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Street") {
+  uuid: UUID
+  region: RegionInput
+  area: AreaInput
+  city: CityInput
+  cityDistrict: CityDistrictInput
+  settlement: SettlementInput
+  name: String
+  isDeleted: Boolean
+}
+
+type Street
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Street") {
+  uuid: UUID
+  region: Region
+  area: Area
+  city: City
+  cityDistrict: CityDistrict
+  settlement: Settlement
+  name: String
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+}
+
+input AddressFilter {
+  uuid: UUIDFilter
+  formattedAddress: StringFilter
+  country: CountryInput
+  region: RegionInput
+  area: AreaInput
+  city: CityInput
+  cityDistrict: CityDistrictInput
+  settlement: SettlementInput
+  street: StreetInput
+  house: StringFilter
+  block: StringFilter
+  flat: StringFilter
+  lat: FloatFilter
+  lon: FloatFilter
+  person: PersonFilter
+  organization: OrganizationFilter
+  isDeleted: Boolean
+  and: [AddressFilter]
+  or: [AddressFilter]
+  not: AddressFilter
+}
+
+input AddressInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Address") {
+  uuid: UUID
+  formattedAddress: String
+  country: CountryInput
+  region: RegionInput
+  area: AreaInput
+  city: CityInput
+  cityDistrict: CityDistrictInput
+  settlement: SettlementInput
+  street: StreetInput
+  house: String
+  block: String
+  flat: String
+  lat: Float
+  lon: Float
+  person: PersonInput
+  organization: OrganizationInput
+  isDeleted: Boolean
+}
+
+type Address
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Address") {
+  uuid: UUID
+  formattedAddress: String
+  country: Country
+  region: Region
+  area: Area
+  city: City
+  cityDistrict: CityDistrict
+  settlement: Settlement
+  street: Street
+  house: String
+  block: String
+  flat: String
+  lat: Float
+  lon: Float
+  person: Person
+  organization: Organization
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+}
+
+extend type Query {
+  country(country: CountryInput): Country @Private
+  countries(country: CountryInput, offset: Int, limit: Int): [Country] @Private
+  region(region: RegionInput): Region @Private
+  regions(region: RegionInput, offset: Int, limit: Int): [Region] @Private
+  area(area: AreaInput): Area @Private
+  areas(area: AreaInput, offset: Int, limit: Int): [Area] @Private
+  city(city: CityInput): City @Private
+  cities(city: CityInput, offset: Int, limit: Int): [City] @Private
+  cityDistrict(cityDistrict: CityDistrictInput): CityDistrict @Private
+  cityDistricts(
+    cityDistrict: CityDistrictInput
+    offset: Int
+    limit: Int
+  ): [CityDistrict] @Private
+  settlement(settlement: SettlementInput): Settlement @Private
+  settlements(
+    settlement: SettlementInput
+    offset: Int
+    limit: Int
+  ): [Settlement] @Private
+  street(street: StreetInput): Street @Private
+  streets(street: StreetInput, offset: Int, limit: Int): [Street] @Private
+  address(address: AddressInput): Address @Private
+  addresses(address: AddressInput, offset: Int, limit: Int): [Address] @Private
+}
+
+extend type Mutation {
+  parseAddress(rawAddress: String): [String] @Private
+  countryMutation(country: CountryInput): Country @Private
+  regionMutation(region: RegionInput): Region @Private
+  areaMutation(area: AreaInput): Area @Private
+  cityMutation(city: CityInput): City @Private
+  cityDistrictMutation(cityDistrict: CityDistrictInput): CityDistrict @Private
+  settlementMutation(settlement: SettlementInput): Settlement @Private
+  streetMutation(street: StreetInput): Street @Private
+  addressMutation(address: AddressInput): Address @Private
+}
+
+extend type Subscription {
+  regionSub: Region
+  areaSub: Area
+  citySub: City
+}

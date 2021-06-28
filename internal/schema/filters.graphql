@@ -1,0 +1,63 @@
+
+
+input UUIDFilter {
+    eq: UUID
+    notEq: UUID
+    in: [UUID]
+    noIn: [UUID]
+}
+
+input StringFilter {
+    ilike: String
+    like: String
+}
+
+input FloatFilter {
+    gt: Float
+    gte: Float
+    lt: Float
+    lte: Float
+    eq: Float
+    notEq: Float
+    between: [Float]
+}
+
+input IntFilter {
+    gt: Int
+    gte: Int
+    lt: Int
+    lte: Int
+    eq: Int
+    notEq: Int
+    between: [Int]
+}
+
+input DateTimeFilter {
+    gt: DateTime
+    gte: DateTime
+    lt: DateTime
+    lte: DateTime
+    eq: DateTime
+    notEq: DateTime
+    between: [DateTime]
+}
+
+input DateFilter {
+    gt: Date
+    gte: Date
+    lt: Date
+    lte: Date
+    eq: Date
+    notEq: Date
+    between: [Date]
+}
+
+input TimeFilter {
+    gt: Time
+    gte: Time
+    lt: Time
+    lte: Time
+    eq: Time
+    notEq: Time
+    between: [Time]
+}

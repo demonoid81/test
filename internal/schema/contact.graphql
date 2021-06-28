@@ -1,0 +1,67 @@
+
+input ContactFilter {
+    uuid: UUIDFilter
+    created: DateTimeFilter
+    updated: DateTimeFilter
+    person: PersonFilter
+    contactType: ContactTypeInput
+    presentation: StringFilter
+    isDeleted: Boolean
+    and: [ContactFilter]
+    or: [ContactFilter]
+    not: ContactFilter
+}
+
+input ContactInput @goModel(model: "github.com/sphera-erp/sphera/internal/models.Contact"){
+    uuid: UUID
+    person: PersonInput
+    organization: OrganizationInput
+    contactType: ContactTypeInput
+    presentation: String
+    isDeleted: Boolean
+}
+
+type Contact  @goModel(model: "github.com/sphera-erp/sphera/internal/models.Contact"){
+    uuid: UUID
+    created: DateTime
+    updated: DateTime
+    person: Person
+    organization: Organization
+    contactType: ContactType
+    presentation: String
+    isDeleted: Boolean
+}
+
+input ContactTypeFilter @goModel(model: "github.com/sphera-erp/sphera/internal/models.ContactTypeFilter"){
+    uuid: UUIDFilter
+    created: DateTimeFilter
+    updated: DateTimeFilter
+    name: StringFilter
+    isDeleted: Boolean
+}
+
+input ContactTypeInput @goModel(model: "github.com/sphera-erp/sphera/internal/models.ContactType") {
+    uuid: UUID
+    name: String
+    isDeleted: Boolean
+}
+
+type ContactType @goModel(model: "github.com/sphera-erp/sphera/internal/models.ContactType"){
+    uuid: UUID
+    created: DateTime
+    updated: DateTime
+    name: String
+    isDeleted: Boolean
+}
+
+extend type Query {
+    contact(contact: ContactInput!): Contact @Private
+    contacts(contact: ContactInput, filter: ContactFilter, offset: Int, limit: Int): [Contact] @Private
+    contactType(contactType: ContactTypeInput): ContactType
+    contactTypes(contactType: ContactTypeInput, filter: ContactTypeFilter, offset: Int, limit: Int): [ContactType] @Private
+}
+
+extend type Mutation {
+    contactMutation(contact: ContactInput): Contact @Private
+    contactTypeMutation(contactType: ContactTypeInput): ContactType @Private
+}

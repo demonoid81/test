@@ -1,0 +1,110 @@
+enum UserType
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.UserType") {
+  SelfEmployed
+  SystemUser
+}
+
+enum UserSortableField
+  @goModel(
+    model: "github.com/sphera-erp/sphera/internal/models.UserSortableField"
+  ) {
+  uuid
+  created
+  updated
+}
+
+enum ClientType {
+  mobile
+  web
+  director
+}
+
+input UserSort
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.UserSort") {
+  field: UserSortableField
+  order: SortOrder = ASC
+}
+
+input UserFilter
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.UserFilter") {
+  created: DateTimeFilter
+  updated: DateTimeFilter
+  person: PersonFilter
+  contact: ContactFilter
+  isDeleted: Boolean
+  isBlocked: Boolean
+  isDisabled: Boolean
+  and: [UserFilter]
+  or: [UserFilter]
+  not: UserFilter
+}
+
+input UserInput
+  @goModel(model: "github.com/sphera-erp/sphera/internal/models.User") {
+  uuid: UUID
+  isDeleted: Boolean
+  isBlocked: Boolean
+  isDisabled: Boolean
+  contact: ContactInput
+  person: PersonInput
+  userType: UserType
+  organization: OrganizationInput
+  groups: [OrganizationInput]
+  objects: [OrganizationInput]
+  role: RoleInput
+}
+
+type User @goModel(model: "github.com/sphera-erp/sphera/internal/models.User") {
+  uuid: UUID
+  created: DateTime
+  updated: DateTime
+  isDeleted: Boolean
+  isBlocked: Boolean
+  isDisabled: Boolean
+  contact: Contact
+  person: Person
+  userType: UserType
+  organization: Organization
+  groups: [Organization]
+  objects: [Organization]
+  role: Role
+}
+
+extend type Query {
+  "Запрос на аутентификацию пользователя"
+  authUserByPhone(phone: String!, client: ClientType): String
+  "Запрос на регистрацию пользователя"
+  regUserByPhone(phone: String!): String
+  "Получить текущего пользователя"
+  getCurrentUser: User @Private
+  user(user: UserInput): User @Private
+  users(
+    user: UserInput
+    filter: UserFilter
+    sort: [UserSort!]
+    offset: Int
+    limit: Int
+  ): [User] @Private
+  usersByObject(
+    object: OrganizationInput
+    user: UserInput
+    filter: UserFilter
+    sort: [UserSort!]
+    offset: Int
+    limit: Int
+  ): [User] @Private
+  userLocation(lat: Float, lon: Float): Boolean @Private
+}
+
+extend type Mutation {
+  "Валидация пользователя в системе"
+  validate(pincode: String!): String @Private
+  "работа с пользователями"
+  userMutation(user: UserInput): User @Private
+  resetUser(phone: String): Boolean! @Private
+  updateToken(token: String!): Boolean! @Private
+}
+
+extend type Subscription {
+  userSub: User @Private
+}

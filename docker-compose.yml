@@ -1,0 +1,71 @@
+version: "3.7"
+services:
+  #  wfmt:
+  #    image: demonoid81/wfmt
+  #    ports:
+  #      - "80:8989"
+
+  tarantool:
+    image: tarantool/tarantool:2.7.1
+    environment:
+      TARANTOOL_USER_NAME: tarantool
+      TARANTOOL_USER_PASSWORD: tarantool
+    volumes:
+      - ./lua:/opt/tarantool/lua
+    command: /usr/local/bin/tarantool /opt/tarantool/lua/boot.lua
+    ports:
+      - "3301:3301"
+      - "8787:80"
+
+  tarantool-admin:
+    image: quay.io/basis-company/tarantool-admin
+    ports:
+      - "8888:80"
+
+  minio:
+    image: minio/minio
+    volumes:
+      - data:/data
+    ports:
+      - "9999:9000"
+    environment:
+      MINIO_ROOT_USER: "AKIAIOSFODNN7EXAMPLE"
+      MINIO_ROOT_PASSWORD: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    command: server /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # gorush:
+  #   image: appleboy/gorush
+  #   restart: always
+  #   ports:
+  #     - "8088:8088"
+  #     - "9999:9000"
+  #   logging:
+  #     options:
+  #       max-size: "100k"
+  #       max-file: "3"
+  #   environment:
+  #     - GORUSH_CORE_QUEUE_NUM=512
+  #     - ANDROID_APIKEY="AAAAg8KmwA0:APA91bGIM1Nt36IFU5YJc0dCHIDmcIt8xtM_1l6c59lN8Y8FtlfU99X17OkgWhb05EroaOYeBF3vnhQ9uBfL5EznUsPDVydAKOvPnLi0ZrV5oXRmtHH9zzgLdeS3amC2m8EK9UqUOeOh"
+
+#  roach:
+#    image: cockroachdb/cockroach:v20.2.5
+#    command: start --insecure
+
+#    volumes:
+#      - db-data:/cockroach/cockroach-data
+#
+#  db-init:
+#    image: cockroachdb/cockroach:v20.2.5
+#    volumes:
+#      - ./init_db.sh:/init_db.sh
+#    entrypoint: "/bin/bash"
+#    command: /setup_db.sh
+
+volumes:
+  data:
+#  db-data:

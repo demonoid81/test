@@ -1,0 +1,38 @@
+enum Object {
+    Organization
+}
+
+input RightToObjectInput @goModel(model: "github.com/sphera-erp/sphera/internal/models.RightToObject") {
+    object: String
+    select: Boolean
+    insert: Boolean
+    update: Boolean
+    delete: Boolean
+}
+
+
+type RightToObject @goModel(model: "github.com/sphera-erp/sphera/internal/models.RightToObject") {
+    object: String
+    select: Boolean
+    insert: Boolean
+    update: Boolean
+    delete: Boolean
+}
+
+
+input TemplateRightsInput @goModel(model: "github.com/sphera-erp/sphera/internal/models.TemplateRights") {
+    uuid: UUID
+    isDeleted: Boolean
+    name: String
+    rightsToObject: [RightToObjectInput]
+}
+
+type TemplateRights @goModel(model: "github.com/sphera-erp/sphera/internal/models.TemplateRights") {
+    uuid: UUID
+    created: DateTime
+    updated: DateTime
+    isDeleted: Boolean
+    name: String
+    rightsToObject: [RightToObject]
+}
+
